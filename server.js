@@ -6,7 +6,8 @@ const bodyParser= require("body-parser");
 const bcrypt= require("bcrypt")
 const jwt= require("jsonwebtoken");
 const axios = require('axios');
-const url='mongodb://localhost:27017/pathToPeace';
+const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+//const url='mongodb://localhost:27017/pathToPeace';
 const nodemailer= require('nodemailer')
 const crypto= require("crypto");
 const fs= require('fs');
