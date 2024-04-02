@@ -1,0 +1,72 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+h1 {
+    font-size: 1.5rem; /* Use rem for better responsiveness */
+    font-weight: bold;
+}
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+input, textarea, button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    /* Styles for smaller screens */
+    main {
+        width: 100%; /* Make main section fill width on small screens */
+    }
+    #uploadPrompt, #prompts {
+        width: 100%; /* Make upload and prompts sections full width */
+    }
+    input[type="number"], textarea {
+        width: 100%; /* Make input and textarea full width */
+    }
+}
+
+/* Prompts container */
+#prompts {
+    width: 60%;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+/* Dynamically added prompt elements */
+#prompts > div {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+#prompts > div:last-child {
+    border-bottom: none;
+}
