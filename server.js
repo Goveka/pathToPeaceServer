@@ -42,6 +42,7 @@ const User= require('./models/newUser');
 const PasswordResetRequest= require('./models/passwordResetRequest');
 const NewJournal= require('./models/newJournal');
 const NewEmotionalRating= require('./models/EmotionalRating');
+const DailyPrompt= require('./models/dailyPrompt');
 
 const verifyJWT = (req, res, next) => {
   try {
@@ -449,5 +450,38 @@ async function getMonthlyReportData(userId) {
   }
 }
 
+
+// uploading daily prompts to the database
+app.post('/dailyPrompts', async(req,res)=>{
+  const{day,prompt}= req.body;
+
+  try {
+    const dailyPrompt= new DailyPrompt({
+      day: day,
+      prompt: prompt
+    })
+
+    await dailyPrompt.save();
+    const promptFromDatabase= DailyPrompt.find();
+    res.status(200).json({prompt: promptFromDatabase});
+  } catch (error) {
+    res.status(500).json({message: "server error!!"})
+  }
+})
+
+app.post('/deletePrompts', async(req,res)=>{
+  const {databaseId}= req.body
+
+  try {
+    const remove= await DailyPrompt.deleteOne({id: new ObjectId(databaseId)});
+    console.log(deleted)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+app.get('/admin', (req,res)=>{
+res.render('admin', {})
+})
 
 app.listen(port, ()=>{console.log(`server is running on port: ${port}`)})
