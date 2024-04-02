@@ -1,13 +1,13 @@
 const express= require('express');
 const mongoose= require("mongoose");
 const app= express();
-const port=process.env.PORT || 6000;
+const port=process.env.PORT || 3000;
 const bodyParser= require("body-parser");
 const bcrypt= require("bcrypt")
 const jwt= require("jsonwebtoken");
 const axios = require('axios');
-const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-//const url='mongodb://localhost:27017/pathToPeace';
+//const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+const url='mongodb://localhost:27017/pathToPeace';
 const nodemailer= require('nodemailer')
 const crypto= require("crypto");
 const fs= require('fs');
@@ -452,22 +452,25 @@ async function getMonthlyReportData(userId) {
 
 
 // uploading daily prompts to the database
-app.post('/dailyPrompts', async(req,res)=>{
-  const{day,prompt}= req.body;
+app.post('/dailyPrompts', async (req, res) => {
+  const { day, prompt } = req.body;
 
   try {
-    const dailyPrompt= new DailyPrompt({
-      day: day,
-      prompt: prompt
-    })
+      const dailyPrompt = new DailyPrompt({
+          day,
+          prompt
+      });
 
-    await dailyPrompt.save();
-    const promptFromDatabase= DailyPrompt.find();
-    res.status(200).json({prompt: promptFromDatabase});
+      await dailyPrompt.save();
+
+      // Await DailyPrompt.find() and access fetched data
+      const promptFromDatabase = await DailyPrompt.find();
+      res.status(200).json({ prompt: promptFromDatabase });
   } catch (error) {
-    res.status(500).json({message: "server error!!"})
+      res.status(500).json({ message: "server error!!" });
   }
-})
+});
+
 
 app.post('/deletePrompts', async(req,res)=>{
   const {databaseId}= req.body
