@@ -6,8 +6,8 @@ const bodyParser= require("body-parser");
 const bcrypt= require("bcrypt")
 const jwt= require("jsonwebtoken");
 const axios = require('axios');
-const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-//const url='mongodb://localhost:27017/pathToPeace';
+//const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+const url='mongodb://localhost:27017/pathToPeace';
 const nodemailer= require('nodemailer')
 const crypto= require("crypto");
 const fs= require('fs');
@@ -485,6 +485,24 @@ app.post('/deletePrompts', async(req,res)=>{
 
 app.get('/admin', (req,res)=>{
 res.render('admin', {})
+});
+
+app.get('/dailyPrompts',verifyJWT, async(req,res)=>{
+  const{token}= req.body;
+  let decode = jwt.verify(token, 'your-secret-key');
+  let day= decode.day;
+
+  try {
+    if(day > 11){
+      res.status(200).json({ prompt: "The user has completed the 11 day journey" });
+    }else{
+      const prompts= await DailyPrompt.find();
+      const prompt = prompts.filter(object => object.day === day);
+      res.status(200).json({prompt: prompt})
+    }
+  } catch (error) {
+    res.status(500).json({message: "server error"})
+  }
 })
 
 app.listen(port, ()=>{console.log(`server is running on port: ${port}`)})

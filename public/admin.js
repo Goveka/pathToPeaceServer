@@ -9,6 +9,7 @@ uploadBtn.addEventListener('click', async ()=>{
     if(dayInput === '' || promptInput === ''){
         alert("inputs are empty")
     }
+    promptsDiv.innerHTML= "";
 
     fetch('/dailyPrompts', {
         method: 'POST',
@@ -37,7 +38,8 @@ uploadBtn.addEventListener('click', async ()=>{
             container.appendChild(actualPrompt);
 
 
-            promptsDiv.appendChild(container)
+            promptsDiv.appendChild(container);
+            console.log(promptsDiv);
         });
     } else {
         console.error('Error: No prompts received from server.');
