@@ -11,4 +11,4 @@ const DailyPromptAnswers = new mongoose.Schema({
     fifthQ: String
 })
 
-module.exports = mongoose.model('EmotionalRating', DailyPromptAnswers);
+module.exports = mongoose.model('DailyPromptAnswers', DailyPromptAnswers);
