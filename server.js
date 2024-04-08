@@ -6,8 +6,8 @@ const bodyParser= require("body-parser");
 const bcrypt= require("bcrypt")
 const jwt= require("jsonwebtoken");
 const axios = require('axios');
-const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-//const url='mongodb://localhost:27017/pathToPeace';
+//const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+const url='mongodb://localhost:27017/pathToPeace';
 const nodemailer= require('nodemailer')
 const crypto= require("crypto");
 const fs= require('fs');
@@ -43,6 +43,7 @@ const PasswordResetRequest= require('./models/passwordResetRequest');
 const NewJournal= require('./models/newJournal');
 const NewEmotionalRating= require('./models/EmotionalRating');
 const DailyPrompt= require('./models/dailyPrompt');
+const DailyPromptAnswers= require('./models/DailyPromptAnswers');
 
 const verifyJWT = (req, res, next) => {
   try {
@@ -312,44 +313,6 @@ app.post('/emotionalRating',verifyJWT, async(req,res)=>{
   }
 });
 
-//finding the last journal and emotional rating, rendering it to the app
-app.post('/findLatestJournalByUserId',verifyJWT, async(req,res)=>{
-  try {
-    const token=req.body.token
-    // Decode the token and extract the userId
-    const decoded = jwt.verify(token, 'your-secret-key'); // Replace with your actual secret key
-    const userId = decoded.userId;
-
-    // Find all journals with the matching userId
-    const journals = await NewJournal.find({ userId });
-
-    // Return the last object in the collection (or null if no journals found)
-    return  res.status(200).json({journal:journals.length > 0 ? journals[journals.length - 1] : null});
-  } catch (error) {
-    return res.status(404).json({message:"your last Journal will appear here"});
-  }
-})
-
-
-
-app.post('/findTheLatestEmotionalRatingByUserId',verifyJWT, async(req,res)=>{
-  try {
-    const token= req.body.token;
-    // Decode the token and extract the userId
-    const decoded = jwt.verify(token, 'your-secret-key'); // Replace with your actual secret key
-    const userId = decoded.userId;
-
-    // Find all journals with the matching userId
-    const ratings = await NewEmotionalRating.find({ userId });
-
-    // Return the last object in the collection (or null if no journals found)
-    return  res.status(200).json({rating:ratings.length > 0 ? ratings[ratings.length - 1] : null});
-  } catch (error) {
-    return res.status(404).json({message:"your Emotional Rating will appear here"});
-  }
-})
-
-
 app.post('/generate-pdf',verifyJWT, async (req, res) => {
   const { token } = req.body;
   const decoded = jwt.verify(token, 'your-secret-key');
@@ -430,7 +393,7 @@ doc.pipe(fs.createWriteStream(filePath));
 doc.end();
 
 // Send a success response after successful generation
-res.json({ url: 'http://192.168.43.154:6000/output.pdf' });
+res.json({ url: `https://pathtopeaceserver.onrender.com/${username}.pdf` });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error generating PDF report' });
@@ -487,7 +450,7 @@ app.get('/admin', (req,res)=>{
 res.render('admin', {})
 });
 
-app.get('/dailyPrompts',verifyJWT, async(req,res)=>{
+app.post('/dailyPrompts',verifyJWT, async(req,res)=>{
   const{token}= req.body;
   let decode = jwt.verify(token, 'your-secret-key');
   let day= decode.day;
@@ -501,7 +464,33 @@ app.get('/dailyPrompts',verifyJWT, async(req,res)=>{
       res.status(200).json({prompt: prompt})
     }
   } catch (error) {
-    res.status(500).json({message: "server error"})
+    res.status(500).json({prompt: "server error"})
+  }
+});
+
+app.post('/dailyPromptsAnswers', verifyJWT, async(req,res)=>{
+  const{token, firstQS,secondQS,thirdQS,fourthQS,fifthQS}= req.body;
+  let decode = jwt.verify(token, 'your-secret-key');
+  let day= decode.day;
+  let userId= decode.userId;
+  let username= decode.username;
+
+  const DailyPromptAnswers= new DailyPromptAnswers({
+    day,
+    userId:userId,
+    username:username,
+    firstQ: firstQS,
+    secondQ: secondQS,
+    thirdQ: thirdQS,
+    fourthQ: fourthQS,
+    fifthQ: fifthQS
+  });
+
+  try {
+    await DailyPromptAnswers.save();
+    return res.status(201).json({message:"success"})
+  } catch (error) {
+    return res.status(500).json({message: "failed"})
   }
 })
 
