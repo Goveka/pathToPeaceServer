@@ -6,8 +6,8 @@ const bodyParser= require("body-parser");
 const bcrypt= require("bcrypt")
 const jwt= require("jsonwebtoken");
 const axios = require('axios');
-//const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-const url='mongodb://localhost:27017/pathToPeace';
+const url='mongodb+srv://Sizwenkala:sizwe123@cluster0.fejtt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+//const url='mongodb://localhost:27017/pathToPeace';
 const nodemailer= require('nodemailer')
 const crypto= require("crypto");
 const fs= require('fs');
@@ -450,48 +450,50 @@ app.get('/admin', (req,res)=>{
 res.render('admin', {})
 });
 
-app.post('/dailyPrompts',verifyJWT, async(req,res)=>{
-  const{token}= req.body;
+app.post('/dailyPrompts', verifyJWT, async (req, res) => {
+  const { token } = req.body;
+
   let decode = jwt.verify(token, 'your-secret-key');
-  let day= decode.day;
+  let day = decode.day;
 
   try {
-    if(day > 11){
-      res.status(200).json({ prompt: "The user has completed the 11 day journey" });
-    }else{
-      const prompts= await DailyPrompt.find();
+    if (day > 11) {
+      res.status(200).json({ message: "The user has completed the 11 day journey" });
+    } else {
+      const prompts = await DailyPrompt.find();
       const prompt = prompts.filter(object => object.day === day);
-      res.status(200).json({prompt: prompt})
+      return res.status(200).json({ prompt }); // Explicitly return the filtered prompt
     }
   } catch (error) {
-    res.status(500).json({prompt: "server error"})
+    res.status(500).json({ prompt: "server error" });
   }
 });
 
-app.post('/dailyPromptsAnswers', verifyJWT, async(req,res)=>{
-  const{token, firstQS,secondQS,thirdQS,fourthQS,fifthQS}= req.body;
-  let decode = jwt.verify(token, 'your-secret-key');
-  let day= decode.day;
-  let userId= decode.userId;
-  let username= decode.username;
 
-  const DailyPromptAnswers= new DailyPromptAnswers({
+app.post('/dailyPromptsAnswers', verifyJWT, async (req, res) => {
+  const { token, answers } = req.body;
+
+  // Verify JWT and extract user info (assuming logic remains the same)
+  let decode = jwt.verify(token, 'your-secret-key');
+  let day = decode.day;
+  let userId = decode.userId;
+  let username = decode.username;
+
+  // Create DailyPromptAnswers object with the answers array
+  const DailyPromptAnswers = new DailyPromptAnswers({
     day,
-    userId:userId,
-    username:username,
-    firstQ: firstQS,
-    secondQ: secondQS,
-    thirdQ: thirdQS,
-    fourthQ: fourthQS,
-    fifthQ: fifthQS
+    userId,
+    username,
+    answers,
   });
 
   try {
     await DailyPromptAnswers.save();
-    return res.status(201).json({message:"success"})
+    return res.status(201).json({ message: "success" });
   } catch (error) {
-    return res.status(500).json({message: "failed"})
+    console.error(error); // Log the error for debugging
+    return res.status(500).json({ message: "failed" });
   }
-})
+});
 
 app.listen(port, ()=>{console.log(`server is running on port: ${port}`)})

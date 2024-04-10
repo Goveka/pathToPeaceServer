@@ -4,11 +4,7 @@ const DailyPromptAnswers = new mongoose.Schema({
     day: Number,
     userId: String,
     username: String,
-    firstQ: String,
-    secondQ: String,
-    thirdQ: String,
-    fourthQ: String,
-    fifthQ: String
+    answers: Array,
 })
 
-module.exports = mongoose.model('EmotionalRating', DailyPromptAnswers);
+module.exports = mongoose.model('DailyPromptAnswers', DailyPromptAnswers);
