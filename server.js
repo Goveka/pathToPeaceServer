@@ -450,7 +450,7 @@ app.get('/admin', (req,res)=>{
 res.render('admin', {})
 });
 
-app.post('/dailyPrompts', verifyJWT, async (req, res) => {
+app.post('/FetchDailyPrompts', verifyJWT, async (req, res) => {
   const { token } = req.body;
 
   let decode = jwt.verify(token, 'your-secret-key');
@@ -460,8 +460,8 @@ app.post('/dailyPrompts', verifyJWT, async (req, res) => {
     if (day > 11) {
       res.status(200).json({ message: "The user has completed the 11 day journey" });
     } else {
-      const prompts = await DailyPrompt.find();
-      const prompt = prompts.filter(object => object.day === day);
+      const prompt = await DailyPrompt.findOne({ day });
+      console.log(prompt)
       return res.status(200).json({ prompt }); // Explicitly return the filtered prompt
     }
   } catch (error) {
